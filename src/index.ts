@@ -1,6 +1,3 @@
-import majorRouter from '@apis/majorDecision/controller';
-import noticeRouter from '@apis/notice/controller';
-import suggestionRouter from '@apis/suggestion/controller';
 import env from '@config';
 import { corsOptions } from '@middlewares/cors';
 import errorHandler from '@middlewares/error-handler';
@@ -15,9 +12,23 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 app.use(express.json());
 app.use(errorHandler);
 
-app.use('/api/suggestion', suggestionRouter);
-app.use('/api/majorDecision', majorRouter);
-app.use('/api/announcement', noticeRouter);
+setTimeout(() => {
+  import('src/hooks/startCrawlingData').then((crawling) => {
+    crawling.initialCrawling();
+  });
+
+  import('@apis/majorDecision/controller').then((majorRouter) => {
+    app.use('/api/majorDecision', majorRouter.default);
+  });
+
+  import('@apis/suggestion/controller').then((suggestionRouter) => {
+    app.use('/api/suggestion', suggestionRouter.default);
+  });
+
+  import('@apis/notice/controller').then((noticeRouter) => {
+    app.use('/api/announcement', noticeRouter.default);
+  });
+}, 15000);
 
 app.get('/test', (req: Request, res: Response) => {
   console.log('test');

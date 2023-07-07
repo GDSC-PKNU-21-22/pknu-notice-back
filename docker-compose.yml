@@ -20,7 +20,7 @@ services:
   database:
     image: mysql:8.0
     container_name: burimi-db
-    restart: unless-stopped
+    restart: always
     environment:
       - LANG=ko_KR.utf8
       - MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
